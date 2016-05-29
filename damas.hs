@@ -57,7 +57,7 @@ encontraColuna coluna pos linha = do -- percorre até achar a coluna certa na li
     else
         encontraColuna coluna (pos + 1) (tail linha)
 
-movePeca tabuleiro linhaAtual colunaAtual linhaDestino colunaDestino turno = do
+verificaPosicaoPeca tabuleiro linhaAtual colunaAtual linhaDestino colunaDestino turno = do
 
     if (turno == 0) then --se for a vez do jogador
 
