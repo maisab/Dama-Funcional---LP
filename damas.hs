@@ -1,5 +1,6 @@
 import Data.List
 import Data.Function
+import Data.Char
 
 tabuleiroInicial = [['p', '0', 'p', '0', 'p', '0', 'p', '0'],
                              ['0', 'p', '0', 'p', '0', 'p', '0', 'p'],
@@ -23,7 +24,7 @@ tabuleiro          = [['p', '0', 'p', '0', 'p', '0', 'p', '0'],
 --pecas c sao do computador
 
 -- -------encontrar posição --------------------
-encontraPosicao :: [[Char]] -> Int -> Int -> Char
+--encontraPosicao :: [[Char]] -> Int -> Int
 encontraPosicao tabuleiro linha coluna =
     encontraColuna coluna 0 (encontraLinha tabuleiro linha 0)
 
@@ -35,51 +36,68 @@ encontraLinha tabuleiro linha pos  = do -- percorre as linhas até achar a linha
 
 encontraColuna coluna pos linha = do -- percorre até achar a coluna certa na linha
     if (coluna == pos)
-        --then '1' : tail linha
-        then head linha
+        --then ('1' : tail linha)
+        then  head linha
     else
         encontraColuna coluna (pos + 1) (tail linha)
 
 -- -------troca posição --------------------
-trocaPosicao tabuleiro linha coluna =
-    trocaColuna coluna 0 (trocaLinha tabuleiro linha 0)
+trocaPosicao tabuleiro novoTabuleiro linhaAtual colunaAtual caracter =
+   trocaLinha tabuleiro [[ ]] linhaAtual colunaAtual caracter
 
-encontraLinha tabuleiro linha pos  = do -- percorre as linhas até achar a linha certa
-    if (linha == pos)
-        then head tabuleiro
-    else
-        encontraLinha (tail tabuleiro) linha (pos + 1)
 
-encontraColuna coluna pos linha = do -- percorre até achar a coluna certa na linha
-    if (coluna == pos)
-        --then '1' : tail linha
-        then head linha
+trocaLinha tabuleiro novoTabuleiro linhaAtual colunaAtual contLinha caracter =
+    if (linhaAtual == contLinha)
+        then  (novoTabuleiro ++ (trocaColuna [(head tabuleiro)] [ ] colunaAtual 0 caracter) ++ (tail tabuleiro))
     else
-        encontraColuna coluna (pos + 1) (tail linha)
+        trocaLinha (tail tabuleiro) (novoTabuleiro ++ [(head tabuleiro)]) linhaAtual colunaAtual (contLinha + 1) caracter
+
+trocaColuna listaLinha listaNova colunaAtual contColuna caracter =
+    if (colunaAtual == contColuna)
+        then (listaNova ++ caracter ++ tail listaLinha)
+    else trocaColuna (tail listaLinha) (listaNova ++ [(head listaLinha)]) colunaAtual (contColuna + 1) caracter
+
+
+--            inserirNaUltimaposicao listaNova caracter
+
+--inserirNaUltimaposicao listaNova caracter =
+--    if (length listaNova == 0)
+--        then caracter
+--    else head listanova: (inserirNaUltimaposicao tail listaNova caracter)
+
+
+    --trocaColuna coluna 0 (trocaLinha tabuleiro linha 0)
+
+--trocaLinha tabuleiro linha pos = do -- percorre as linhas até achar a linha certa
+--    if (linha == pos)
+--        then head tabuleiro
+--    else
+--        trocaLinha (tail tabuleiro) linha (pos + 1)
+
+--trocaColuna coluna pos linha = do -- percorre até achar a coluna certa na linha
+--    if (coluna == pos)
+--        then ('1' : tail linha)
+--        --then  head linha
+--    else
+--        trocaColuna coluna (pos + 1) (tail linha)
 
 
 -- -------verificar posição ---------------------
 verificaPosicaoPeca tabuleiro linhaAtual colunaAtual linhaDestino colunaDestino turno = do
 
+    --verificar o numero de pecas
+    --ir incrementando o turno
+
     if (turno == 0) then --se for a vez do jogador
         if ( (encontraPosicao tabuleiro linhaAtual colunaAtual) == 'p')  then -- se existe uma peca na posicao atual
-            if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaDestino + 1)) ) then --se for uma casa possivel para direita
+            if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual + 1)) ) then --se for uma casa possivel para direita
                 case (encontraPosicao tabuleiro linhaDestino colunaDestino) of
                     '1' -> putStrLn "yay!" --mover  peca para direita e colocar 1 na posicao antiga
                     'b' -> putStrLn "yay!" --comer peca a direita
                     'B' -> putStrLn "yay!"--comer peca a direita
                     _ -> putStrLn "Nao e uma casa valida!"--comer peca a direita
 
-                        --if( (encontraPosicao tabuleiro linhaDestino colunaDestino) == '1' ) then --se a casa esta livre
-                        --        --precisa mover direita e colocar 1 na posição antiga
-
-                        --else if( ((encontraPosicao tabuleiro linhaDestino colunaDestino) == 'b') || ((encontraPosicao tabuleiro linhaDestino colunaDestino) == 'B') ) then --se for uma peca do adversario a direita
-                        --        --precisa comer a direita
-
-                        --else
-                        --        --nao é uma jogada possivel
-
-            else if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaDestino - 1))) then  --se for uma casa possivel para esquerda
+            else if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual - 1))) then  --se for uma casa possivel para esquerda
                 case (encontraPosicao tabuleiro linhaDestino colunaDestino) of
                     '1' -> putStrLn "yay!" --mover  peca para direita e colocar 1 na posicao antiga
                     'b' -> putStrLn "yay!" --comer peca a direita
@@ -96,4 +114,6 @@ verificaPosicaoPeca tabuleiro linhaAtual colunaAtual linhaDestino colunaDestino 
          putStrLn "Nao e sua vez!"
 
 -- ------- main ---------------------
-main = print(encontraPosicao tabuleiro 7 7)
+main = do
+            print(encontraPosicao tabuleiro 7 7)
+            --print(trocaPosicao tabuleiro 6 5)
