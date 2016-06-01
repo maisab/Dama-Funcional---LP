@@ -1,6 +1,8 @@
 import Data.List
 import Data.Function
 import Data.Char
+import Control.Monad
+import System.Random
 
 tabuleiroInicial = [['p', '0', 'p', '0', 'p', '0', 'p', '0'],
                              ['0', 'p', '0', 'p', '0', 'p', '0', 'p'],
@@ -24,38 +26,37 @@ tabuleiro          = [['p', '0', 'p', '0', 'p', '0', 'p', '0'],
 --pecas c sao do computador
 
 -- -------encontrar posição --------------------
---encontraPosicao :: [[Char]] -> Int -> Int
-encontraPosicao tabuleiro linha coluna =
-    encontraColuna coluna 0 (encontraLinha tabuleiro linha 0)
+encontraPosicao :: [[Char]] -> Int -> Int -> Char
+encontraPosicao board linha coluna =
+    encontraColuna coluna 0 (encontraLinha board linha 0)
 
-encontraLinha tabuleiro linha pos  = do -- percorre as linhas até achar a linha certa
+encontraLinha board linha pos  = do -- percorre as linhas até achar a linha certa
     if (linha == pos)
-        then head tabuleiro
+        then head board
     else
-        encontraLinha (tail tabuleiro) linha (pos + 1)
+        encontraLinha (tail board) linha (pos + 1)
 
 encontraColuna coluna pos linha = do -- percorre até achar a coluna certa na linha
     if (coluna == pos)
-        --then ('1' : tail linha)
         then  head linha
     else
         encontraColuna coluna (pos + 1) (tail linha)
 
 -- -------troca posição --------------------
---trocaPosicao :: ([[Char]] -> [[]] -> Int -> Int -> Char)-> [[Char]]
-trocaPosicao tabuleiro novoTabuleiro linhaAtual colunaAtual caracter =
-   trocaLinha tabuleiro [[ ]] linhaAtual colunaAtual caracter
+--trocaPosicao :: ([[Char]] -> [[ ]] -> Int -> Int -> Char)-> [[Char]]
+--trocaPosicao board novoTabuleiro linhaAtual colunaAtual caracter =
+--   trocaLinha board [[ ]] linhaAtual colunaAtual caracter
 
-trocaLinha tabuleiro novoTabuleiro linhaAtual colunaAtual contLinha caracter =
-    if (linhaAtual == contLinha)
-        then  (novoTabuleiro ++ (trocaColuna [(head tabuleiro)] [ ] colunaAtual 0 caracter) ++ (tail tabuleiro))
-    else
-        trocaLinha (tail tabuleiro) (novoTabuleiro ++ [(head tabuleiro)]) linhaAtual colunaAtual (contLinha + 1) caracter
+--trocaLinha board novoTabuleiro linhaAtual colunaAtual contLinha caracter =
+--    if (linhaAtual == contLinha)
+--        then  (novoTabuleiro ++ (trocaColuna [(head board)] [ ] colunaAtual 0 caracter) ++ (tail board))
+--    else
+--        trocaLinha (tail board) (novoTabuleiro ++ [(head board)]) linhaAtual colunaAtual (contLinha + 1) caracter
 
-trocaColuna listaLinha listaNova colunaAtual contColuna caracter =
-    if (colunaAtual == contColuna)
-        then (listaNova ++ caracter ++ tail listaLinha)
-    else trocaColuna (tail listaLinha) (listaNova ++ [(head listaLinha)]) colunaAtual (contColuna + 1) caracter
+--trocaColuna listaLinha listaNova colunaAtual contColuna caracter =
+--    if (colunaAtual == contColuna)
+--        then (listaNova ++ caracter ++ tail listaLinha)
+--    else trocaColuna (tail listaLinha) (listaNova ++ [(head listaLinha)]) colunaAtual (contColuna + 1) caracter
 
 
 -- printar matriz ----------------------------------------
@@ -79,38 +80,86 @@ trocaColuna listaLinha listaNova colunaAtual contColuna caracter =
 --    else
 --        putStrLn "Acabou linha  "
 
+-------------------------------------------------------------------------------
+trocaPosicao (hd : ht) linha coluna contLinha contColuna char =
+    if( linha == contLinha) then
+        [(trocaColuna hd coluna contColuna char)] ++ ht --passa a lista da linha atual
+    else
+        hd : (trocaPosicao ht linha coluna (contLinha + 1) contColuna char) --salva a cabeça atual
+
+trocaColuna (hd1 : ht1) coluna posColuna char =
+    if(coluna == posColuna) then
+        [char] ++ ht1 --tira a cabeça e concatena o caracter com a calda
+
+    else
+        hd1 : (trocaColuna ht1 coluna (posColuna + 1) char) --salva a cabeça atual
+
 -- -------verificar posição ---------------------
+verificaPosicaoPeca :: [[Char]] -> Int -> Int -> Int -> Int -> Int -> Int-> IO ()
 verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino turno nPecas= do
 
-    --verificar o numero de pecas
-    --ir incrementando o turno
+    putStrLn "Printas tabuleiro"
 
     if (turno == 0) then --se for a vez do jogador
+
+        --putStrLn ("Digite a linha da peca atual")
+        --linhaAtual <- getChar
+
+        --putStrLn ("Digite a coluna da peca atual")
+        --colunaAtual <- getChar
+
+        --putStrLn ("Digite a linha da casa de destino")
+        --linhaDestino <- getChar
+
+        --putStrLn ("Digite a coluna da casa de destino")
+        --colunaDestino <- getChar
+
         if ( (encontraPosicao board linhaAtual colunaAtual) == 'p')  then -- se existe uma peca na posicao atual
             if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual + 1)) ) then --se for uma casa possivel para direita
-                case (encontraPosicao board linhaDestino colunaDestino) of
-                    '1' ->
-                        putStrLn "-- trocando peca, casa vazia --" --mover  peca para direita e colocar 1 na posicao antiga
-                        --verificaPosicaoPeca (trocaPosicao board [[ ]] linhaAtual colunaAtual caracter)
 
-                    'b' -> putStrLn "yay!" --comer peca a direita
-                    'B' -> putStrLn "yay!"--comer peca a direita
-                    _ -> putStrLn "Nao e uma casa valida!"--comer peca a direita
+                if ((encontraPosicao board linhaDestino colunaDestino) == '1') then
+                    --putStrLn "Trocando linha"
+                    verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 'p') linhaAtual colunaAtual 0 0 '1') 0 0 0 0 1 0
+
+                else if ((encontraPosicao board linhaDestino colunaDestino) == 'c') then
+                    if ( (linhaDestino == 7) || ( colunaDestino == 7) ) then
+                            --putStrLn ("Jogada Impossível")
+                            verificaPosicaoPeca board 0 0 0 0 0 0
+
+                    else --come a peca
+                            verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 '1') (linhaDestino + 1) (colunaDestino + 1) 0 0 'p') 0 0 0 0 0 0
+
+                else --posição inválida
+                            verificaPosicaoPeca board 0 0 0 0 0 0
+                    --    'B' -> putStrLn "yay!"--comer peca a direita
+                    --    _ -> putStrLn "Nao e uma casa valida!"--comer peca a direita
 
             else if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual - 1))) then  --se for uma casa possivel para esquerda
-                case (encontraPosicao board linhaDestino colunaDestino) of
-                    '1' -> putStrLn "yay!" --mover  peca para direita e colocar 1 na posicao antiga
-                    'b' -> putStrLn "yay!" --comer peca a direita
-                    'B' -> putStrLn "yay!"--comer peca a direita
-                    _ -> putStrLn "Nao e uma casa valida!"--comer peca a direita
+
+                if ((encontraPosicao board linhaDestino colunaDestino) == '1') then
+                    verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 'p') linhaAtual colunaAtual 0 0 '1') 0 0 0 0 1 0
+
+                else if ((encontraPosicao board linhaDestino colunaDestino) == 'c') then
+                        if ( (linhaDestino == 7) || ( colunaDestino == 0) ) then
+                            --putStrLn ("Jogada Impossível")
+                            verificaPosicaoPeca board 0 0 0 0 0 0
+
+                        else --come a peca
+                            verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 '1') (linhaDestino - 1) (colunaDestino - 1) 0 0 'p') 0 0 0 0 0 0
+
+                else --else comer peça
+                            verificaPosicaoPeca board 0 0 0 0 0 0 --jogada inválida
+                    --    'B' -> putStrLn "yay!"--comer peca a direita
+                    --    _ -> putStrLn "Nao e uma casa valida!"--comer peca a direita
 
             else
                    putStrLn "Nao e uma casa valida!"
                       --nao é uma jogada possivel
-        else
+
+        else -- else peça selecionada
             putStrLn "Nao e uma peca valida!"
 
-    else
+    else -- else turno
          putStrLn "Nao e sua vez!"
 
 -- ------- main ---------------------
