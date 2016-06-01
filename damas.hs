@@ -2,7 +2,7 @@ import Data.List
 import Data.Function
 import Data.Char
 import Control.Monad
-import System.Random
+--import System.Random
 
 tabuleiro          = [['p', '0', 'p', '0', 'p', '0', 'p', '0'],
                              ['0', 'p', '0', 'p', '0', 'p', '0', 'p'],
@@ -113,10 +113,22 @@ verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino turn
          --putStrLn "Nao e sua vez!"
          return()
 
+
+--       -----RECEBER POSIÇÕES PARA JOGADA-----
+recebePosicao = do
+    putStrLn ("Por favor, digite a posicao da linha: ")
+    valorLinha <- getLine
+    putStrLn ("Numero da linha: " ++ valorLinha )
+
+    putStrLn ("Por favor, digite a posicao da coluna: ")
+    valorColuna <- getLine
+    putStrLn ("Numero da coluna: " ++ valorColuna )
+    
+
 -- ------- main ---------------------
 main = do
-            verificaPosicaoPeca tabuleiro 2 0 4 1 0 0
-            --print
+            --verificaPosicaoPeca tabuleiro 2 0 4 1 0 0
+            recebePosicao
             --printaMatriz (trocaPosicao tabuleiro [[ ]] 7 7 's') 0
             --print(encontraPosicao tabuleiro 7 7)
             --print(trocaPosicao tabuleiro [[ ]] 6 5 't')
