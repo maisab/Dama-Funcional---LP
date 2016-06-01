@@ -34,6 +34,7 @@ encontraColuna coluna pos linha = do -- percorre até achar a coluna certa na li
         encontraColuna coluna (pos + 1) (tail linha)
 
 -- -------troca posição-----------------------------------------------------------------------------
+--trocaPosicao :: [[Char]] -> Int -> Int -> Int -> Int -> [[Char]]
 trocaPosicao (hd : ht) linha coluna contLinha contColuna char =
     if( linha == contLinha) then
         [(trocaColuna hd coluna contColuna char)] ++ ht --passa a lista da linha atual
@@ -48,74 +49,83 @@ trocaColuna (hd1 : ht1) coluna posColuna char =
         hd1 : (trocaColuna ht1 coluna (posColuna + 1) char) --salva a cabeça atual
 
 -- -------verificar posição ---------------------
-verificaPosicaoPeca :: [[Char]] -> Int -> Int -> Int -> Int -> Int -> Int-> IO ()
-verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino turno nPecas= do
+verificaPosicaoPeca :: [[Char]] -> Int -> Int -> Int -> Int -> Int -> Int-> Int-> IO ()
+verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino turno pecasJogador pecasComputador  = do
 
     putStrLn "Printar tabuleiro"
     print(board)
 
-    if (turno == 0) then --se for a vez do jogador
+    if (pecasComputador == 0) then
+        --print("Parabén você venceu !")
+        return()
 
-        --putStrLn ("Digite a linha da peca atual")
-        --linhaAtual <- getChar
+    else if (pecasJogador == 0) then
+        --putStrLn "Você perdeu :("
+        return()
 
-        --putStrLn ("Digite a coluna da peca atual")
-        --colunaAtual <- getChar
+    else
+        if (turno == 0) then --se for a vez do jogador
 
-        --putStrLn ("Digite a linha da casa de destino")
-        --linhaDestino <- getChar
+            -- para direita
+            if ( (encontraPosicao board linhaAtual colunaAtual) == 'p')  then -- se existe uma peca na posicao atual
+                if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual + 1))  && (linhaAtual < 7)  && (colunaAtual < 7) ) then --se for uma casa possivel para direita
 
-        --putStrLn ("Digite a coluna da casa de destino")
-        --colunaDestino <- getChar
+                    if ((encontraPosicao board linhaDestino colunaDestino) == '1') then
+                        if (colunaDestino == 7) then --vira dama
+                            verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 'P') linhaAtual colunaAtual 0 0 '1') linhaAtual colunaAtual linhaDestino colunaDestino 1 pecasJogador pecasComputador
 
-        if ( (encontraPosicao board linhaAtual colunaAtual) == 'p')  then -- se existe uma peca na posicao atual
-            if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual + 1)) ) then --se for uma casa possivel para direita
+                        else
+                            verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 'p') linhaAtual colunaAtual 0 0 '1') linhaAtual colunaAtual linhaDestino colunaDestino 1 pecasJogador pecasComputador
 
-                if ((encontraPosicao board linhaDestino colunaDestino) == '1') then
-                    --putStrLn "Trocando linha"
-                    verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 'p') linhaAtual colunaAtual 0 0 '1') linhaAtual colunaAtual linhaDestino colunaDestino 1 0
+                    else if ((encontraPosicao board linhaDestino colunaDestino) == 'c') then
+                        if ( (linhaDestino == 7) || ( colunaDestino == 7) ) then
+                                --putStrLn ("Jogada Impossível")
+                                verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino 0 pecasJogador pecasComputador
 
-                else if ((encontraPosicao board linhaDestino colunaDestino) == 'c') then
-                    if ( (linhaDestino == 7) || ( colunaDestino == 7) ) then
-                            --putStrLn ("Jogada Impossível")
-                            verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino 0 0
+                        else --come a peca
+                                verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 '1') (linhaDestino + 1) (colunaDestino + 1) 0 0 'p') linhaAtual colunaAtual linhaDestino colunaDestino 1 pecasJogador (pecasComputador - 1)
 
-                    else --come a peca
-                            verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 '1') (linhaDestino + 1) (colunaDestino + 1) 0 0 'p') 0 0 0 0 0 0
+                    else --posição inválida
+                                verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino 0 pecasJogador pecasComputador
 
-                else --posição inválida
-                            verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino 0 0
+            -- para esquerda
+                else if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual - 1))  && (linhaAtual < 7)  && (colunaAtual > 0) ) then  --se for uma casa possivel para esquerda
 
-            else if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual - 1))) then  --se for uma casa possivel para esquerda
+                    if ((encontraPosicao board linhaDestino colunaDestino) == '1') then
+                        verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 'p') linhaAtual colunaAtual 0 0 '1') linhaAtual colunaAtual linhaDestino colunaDestino 1 pecasJogador pecasComputador
 
-                if ((encontraPosicao board linhaDestino colunaDestino) == '1') then
-                    verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 'p') linhaAtual colunaAtual 0 0 '1') 0 0 0 0 1 0
+                    else if ((encontraPosicao board linhaDestino colunaDestino) == 'c') then
+                       if ( (linhaDestino == 7) || ( colunaDestino == 0) ) then
+                                --putStrLn ("Jogada Impossível")
+                                verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino 0 pecasJogador pecasComputador
 
-                else if ((encontraPosicao board linhaDestino colunaDestino) == 'c') then
-                   if ( (linhaDestino == 7) || ( colunaDestino == 0) ) then
-                            --putStrLn ("Jogada Impossível")
-                            verificaPosicaoPeca board 0 0 0 0 0 0
+                        else --come a peca
+                                verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 '1') (linhaDestino - 1) (colunaDestino - 1) 0 0 'p') linhaAtual colunaAtual linhaDestino colunaDestino 1 pecasJogador (pecasComputador - 1)
 
-                    else --come a peca
-                            verificaPosicaoPeca ( trocaPosicao (trocaPosicao board linhaDestino colunaDestino 0 0 '1') (linhaDestino - 1) (colunaDestino - 1) 0 0 'p') 0 0 0 0 0 0
 
-                else --else comer peça
-                            verificaPosicaoPeca board 0 0 0 0 0 0 --jogada inválida
+                    else
+                                --borda tabuleiro
+                                verificaPosicaoPeca board linhaAtual colunaAtual linhaAtual colunaDestino 0 pecasJogador pecasComputador --jogada inválida
 
-            else -- não é a proxima linha
-                   putStrLn "Nao e uma casa valida!"
-                      --nao é uma jogada possivel
+                else -- não é a proxima linha
+                       putStrLn "Nao e uma casa valida!"
+                          --nao é uma jogada possivel
 
-        else -- else peça selecionada
-            putStrLn "Nao e uma peca valida!"
+            else -- else peça selecionada
+                putStrLn "Nao e uma peca valida!"
 
-    else -- else turno
-         --putStrLn "Nao e sua vez!"
-         return()
+        else -- else turno
+             --putStrLn "Nao e sua vez!"
+             return()
+
 
 -- ------- main ---------------------
 main = do
-            verificaPosicaoPeca tabuleiro 2 0 4 1 0 0
+            verificaPosicaoPeca tabuleiro 2 0 3 0 0 12 12
+            --putStrLn "Please enter your name: "
+            --name <- getLine
+            --putStrLn ("Name: " ++ name ++ " nada")
+            --return()
             --print
             --printaMatriz (trocaPosicao tabuleiro [[ ]] 7 7 's') 0
             --print(encontraPosicao tabuleiro 7 7)
