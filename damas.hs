@@ -42,9 +42,9 @@ encontraColuna coluna pos linha = do -- percorre até achar a coluna certa na li
         encontraColuna coluna (pos + 1) (tail linha)
 
 -- -------troca posição --------------------
+--trocaPosicao :: ([[Char]] -> [[]] -> Int -> Int -> Char)-> [[Char]]
 trocaPosicao tabuleiro novoTabuleiro linhaAtual colunaAtual caracter =
    trocaLinha tabuleiro [[ ]] linhaAtual colunaAtual caracter
-
 
 trocaLinha tabuleiro novoTabuleiro linhaAtual colunaAtual contLinha caracter =
     if (linhaAtual == contLinha)
@@ -58,47 +58,47 @@ trocaColuna listaLinha listaNova colunaAtual contColuna caracter =
     else trocaColuna (tail listaLinha) (listaNova ++ [(head listaLinha)]) colunaAtual (contColuna + 1) caracter
 
 
---            inserirNaUltimaposicao listaNova caracter
+-- printar matriz ----------------------------------------
 
---inserirNaUltimaposicao listaNova caracter =
---    if (length listaNova == 0)
---        then caracter
---    else head listanova: (inserirNaUltimaposicao tail listaNova caracter)
+--printaMatriz tabuleiro =
+--    printaColuna 0 (printaLinha tabuleiro 0)
 
-
-    --trocaColuna coluna 0 (trocaLinha tabuleiro linha 0)
-
---trocaLinha tabuleiro linha pos = do -- percorre as linhas até achar a linha certa
---    if (linha == pos)
---        then head tabuleiro
+--printaLinha tabuleiro posL  = do -- percorre as linhas até achar a linha certa
+--    if ( (length tabuleiro) /= posL)
+--        then printaLinha (tail tabuleiro) (posL + 1)
 --    else
---        trocaLinha (tail tabuleiro) linha (pos + 1)
+--        putStrLn "Acabou Tabuleiro"
 
---trocaColuna coluna pos linha = do -- percorre até achar a coluna certa na linha
---    if (coluna == pos)
---        then ('1' : tail linha)
---        --then  head linha
+--printaColuna posC linhaLista = do -- percorre até achar a coluna certa na linha
+--    if ((length linhaLista) /= posC)
+--        --then ('1' : tail linha)
+--        then
+--            putStrLn (linhaLista !! posC)
+--            --putStrLn (head linha)
+--            printaColuna (posC + 1)  (tail linhaLista)
 --    else
---        trocaColuna coluna (pos + 1) (tail linha)
-
+--        putStrLn "Acabou linha  "
 
 -- -------verificar posição ---------------------
-verificaPosicaoPeca tabuleiro linhaAtual colunaAtual linhaDestino colunaDestino turno = do
+verificaPosicaoPeca board linhaAtual colunaAtual linhaDestino colunaDestino turno nPecas= do
 
     --verificar o numero de pecas
     --ir incrementando o turno
 
     if (turno == 0) then --se for a vez do jogador
-        if ( (encontraPosicao tabuleiro linhaAtual colunaAtual) == 'p')  then -- se existe uma peca na posicao atual
+        if ( (encontraPosicao board linhaAtual colunaAtual) == 'p')  then -- se existe uma peca na posicao atual
             if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual + 1)) ) then --se for uma casa possivel para direita
-                case (encontraPosicao tabuleiro linhaDestino colunaDestino) of
-                    '1' -> putStrLn "yay!" --mover  peca para direita e colocar 1 na posicao antiga
+                case (encontraPosicao board linhaDestino colunaDestino) of
+                    '1' ->
+                        putStrLn "-- trocando peca, casa vazia --" --mover  peca para direita e colocar 1 na posicao antiga
+                        --verificaPosicaoPeca (trocaPosicao board [[ ]] linhaAtual colunaAtual caracter)
+
                     'b' -> putStrLn "yay!" --comer peca a direita
                     'B' -> putStrLn "yay!"--comer peca a direita
                     _ -> putStrLn "Nao e uma casa valida!"--comer peca a direita
 
             else if ( (linhaDestino == (linhaAtual + 1)) && (colunaDestino  ==  (colunaAtual - 1))) then  --se for uma casa possivel para esquerda
-                case (encontraPosicao tabuleiro linhaDestino colunaDestino) of
+                case (encontraPosicao board linhaDestino colunaDestino) of
                     '1' -> putStrLn "yay!" --mover  peca para direita e colocar 1 na posicao antiga
                     'b' -> putStrLn "yay!" --comer peca a direita
                     'B' -> putStrLn "yay!"--comer peca a direita
@@ -115,5 +115,7 @@ verificaPosicaoPeca tabuleiro linhaAtual colunaAtual linhaDestino colunaDestino 
 
 -- ------- main ---------------------
 main = do
+            --print
+            --printaMatriz (trocaPosicao tabuleiro [[ ]] 7 7 's') 0
             print(encontraPosicao tabuleiro 7 7)
-            --print(trocaPosicao tabuleiro 6 5)
+            --print(trocaPosicao tabuleiro [[ ]] 6 5 't')
