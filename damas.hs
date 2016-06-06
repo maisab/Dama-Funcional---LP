@@ -82,7 +82,9 @@ realizaJogadas board turno pecasJogador pecasComputador  = do
     else
         if (turno == 0) then --se for a vez do jogador
             if ( (encontraPosicao board (getInt linhaAtual) (getInt colunaAtual)) == 'p')  then -- se existe uma peca na posicao atual
-                if ( ( (getInt linhaDestino) == ((getInt linhaAtual) + 1)) && (( (getInt colunaDestino)  ==  ( (getInt colunaAtual) + 1)) || ( (getInt colunaDestino)  ==  ( ( getInt colunaAtual) - 1))  )  &&  ( ( (getInt linhaAtual) <= 7)  &&  (( (getInt colunaAtual) <= 7)  || ((getInt colunaAtual) >= 0)  ) ) ) then --se for uma casa possivel para direita
+                if ( ((getInt linhaDestino) == ((getInt linhaAtual) + 1)) &&
+                    ( ((getInt colunaDestino)  ==  ( (getInt colunaAtual) + 1)) || ( (getInt colunaDestino)  ==  (( getInt colunaAtual) - 1) ))  &&
+                    ( ((getInt linhaAtual) <= 7)  &&  (( (getInt colunaAtual) <= 7)  || ((getInt colunaAtual) >= 0)) ) ) then --se for uma casa possivel para direita
                        --putStrLn "Nao e uma casa valida!"
 
                     if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == '1') then
@@ -92,9 +94,12 @@ realizaJogadas board turno pecasJogador pecasComputador  = do
                         else
                             realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 'p') (getInt linhaAtual) (getInt colunaAtual) 0 0 '1') 1 pecasJogador pecasComputador
 
-                    else if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == 'c') then
-                        if (  (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 0))  ||
-                              (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 7)) ) then
+                    else if ( ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == 'c') &&      --se for peça do adversario e puder comer
+                                ( ((encontraPosicao board ((getInt linhaDestino) + 1) ((getInt colunaDestino) + 1)) == '1' ) ||
+                                ((encontraPosicao board ((getInt linhaDestino) + 1) ((getInt colunaDestino) - 1)) == '1') ) ) then
+
+                        if (  (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 0))  || -- inferior esquerdo
+                              (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 7)) ) then --inferior direito
                                 --putStrLn ("Jogada Impossível")
                                 realizaJogadas board 0 pecasJogador pecasComputador
 
@@ -104,7 +109,7 @@ realizaJogadas board turno pecasJogador pecasComputador  = do
                                 else --come para esquerda
                                     realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) + 1) ( (getInt colunaDestino) - 1) 0 0 'p') 1 pecasJogador (pecasComputador - 1)
 
-                    else --posição inválida
+                    else --posição inválida ou não é possivel comer
                                 realizaJogadas board 0 pecasJogador pecasComputador
 
                 -- não é a proxima linha
@@ -115,23 +120,30 @@ realizaJogadas board turno pecasJogador pecasComputador  = do
 
              ----------------------------------------Dama---------------------------
 
-            else if ( (encontraPosicao board (getInt linhaAtual) (getInt colunaAtual)) == 'P')  then -- se existe uma peca na posicao atual
-                if ( ((getInt linhaDestino) == ((getInt linhaAtual) + 1) || ((getInt linhaDestino) == ((getInt linhaAtual) - 1)) ) && ( ((getInt colunaDestino)  ==  ( (getInt colunaAtual) + 1)) || ( (getInt colunaDestino)  ==  ( ( getInt colunaAtual) - 1)) )  &&  ( ((getInt linhaAtual) < 7)  &&  ( ((getInt colunaAtual) < 7)  || ((getInt colunaAtual) > 0) ) ) ) then --se for uma casa possivel para direita
+            else if ( (encontraPosicao board (getInt linhaAtual) (getInt colunaAtual)) == 'P')  then  -- se existe uma peca na posicao atual
+                if ( ((getInt linhaDestino) == ((getInt linhaAtual) + 1) || ((getInt linhaDestino) == ((getInt linhaAtual) - 1)) ) &&
+                    ( ((getInt colunaDestino)  ==  ( (getInt colunaAtual) + 1)) || ( (getInt colunaDestino)  ==  ( ( getInt colunaAtual) - 1)) )  &&
+                    ( (((getInt linhaAtual) <= 7) || ((getInt linhaAtual) >= 0) )  &&  ( ((getInt colunaAtual) <= 7)  || ((getInt colunaAtual) >= 0)) )) then --se for uma casa possivel para direita
                        --putStrLn "Nao e uma casa valida!"
 
                     if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == '1') then
                             realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 'P') (getInt linhaAtual) (getInt colunaAtual) 0 0 '1') 1 pecasJogador pecasComputador
 
-                    else if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == 'c') then
-                        if (  (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 0)) ||
-                              (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 7)) ||
-                              (((getInt linhaDestino) == 0) && ((getInt colunaDestino) == 7)) ||
-                              (((getInt linhaDestino) == 0) && ((getInt colunaDestino) == 0)) ) then
+                    else if ( (encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == 'c' &&  --se for peça do adversario e puder comer
+                                ( ((encontraPosicao board ((getInt linhaDestino) + 1) ((getInt colunaDestino) + 1)) == '1' ) ||
+                                ((encontraPosicao board ((getInt linhaDestino) + 1) ((getInt colunaDestino) - 1)) == '1' ) ||
+                                ((encontraPosicao board ((getInt linhaDestino) - 1) ((getInt colunaDestino) + 1)) == '1' ) ||
+                                ((encontraPosicao board ((getInt linhaDestino) - 1) ((getInt colunaDestino) - 1)) == '1' ) ) ) then
+
+                        if (  (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 0)) || --inferior esquerdo
+                              (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 7)) || --inferior direito
+                              (((getInt linhaDestino) == 0) && ((getInt colunaDestino) == 7)) || --superior direito
+                              (((getInt linhaDestino) == 0) && ((getInt colunaDestino) == 0)) ) then --superior esquerdo
                                 --putStrLn ("Jogada Impossível")
                                 realizaJogadas board 0 pecasJogador pecasComputador
 
                         else --come a peca
-                                if( ((getInt linhaDestino) == ( (getInt linhaAtual) + 1)) && ((getInt colunaDestino) == ( (getInt colunaAtual) + 1)) ) then --come para direita
+                                if( (((getInt linhaDestino) == ( (getInt linhaAtual) + 1)) && ((getInt colunaDestino) == ( (getInt colunaAtual) + 1)) ) ) then --come para direita
                                     realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) + 1) ( ( getInt colunaDestino) + 1) 0 0 'p') 1 pecasJogador (pecasComputador - 1)
 
                                 else if ( ((getInt linhaDestino) == ( (getInt linhaAtual) + 1)) && ((getInt colunaDestino) == ( (getInt colunaAtual) - 1)) ) then -- come para esquerda
@@ -143,7 +155,7 @@ realizaJogadas board turno pecasJogador pecasComputador  = do
                                 else --come para trás e esquerda
                                     realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) - 1) ( (getInt colunaDestino) - 1) 0 0 'p') 1 pecasJogador (pecasComputador - 1)
 
-                    else --posição inválida
+                    else --posição inválida ou não é possivel comer
                                 realizaJogadas board 0 pecasJogador pecasComputador
 
                 -- não é a proxima linha
