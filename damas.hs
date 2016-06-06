@@ -82,7 +82,7 @@ realizaJogadas board turno pecasJogador pecasComputador  = do
     else
         if (turno == 0) then --se for a vez do jogador
             if ( (encontraPosicao board (getInt linhaAtual) (getInt colunaAtual)) == 'p')  then -- se existe uma peca na posicao atual
-                if ( ( (getInt linhaDestino) == ((getInt linhaAtual) + 1)) && (( (getInt colunaDestino)  ==  ( (getInt colunaAtual) + 1)) || ( (getInt colunaDestino)  ==  ( ( getInt colunaAtual) - 1))  )  &&  ( ( (getInt linhaAtual) < 7)  &&  (( (getInt colunaAtual) < 7)  || ((getInt colunaAtual) > 0)  ) ) ) then --se for uma casa possivel para direita
+                if ( ( (getInt linhaDestino) == ((getInt linhaAtual) + 1)) && (( (getInt colunaDestino)  ==  ( (getInt colunaAtual) + 1)) || ( (getInt colunaDestino)  ==  ( ( getInt colunaAtual) - 1))  )  &&  ( ( (getInt linhaAtual) <= 7)  &&  (( (getInt colunaAtual) <= 7)  || ((getInt colunaAtual) >= 0)  ) ) ) then --se for uma casa possivel para direita
                        --putStrLn "Nao e uma casa valida!"
 
                     if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == '1') then
@@ -93,7 +93,8 @@ realizaJogadas board turno pecasJogador pecasComputador  = do
                             realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 'p') (getInt linhaAtual) (getInt colunaAtual) 0 0 '1') 1 pecasJogador pecasComputador
 
                     else if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == 'c') then
-                        if ( ((getInt linhaDestino) == 7) || ((getInt colunaDestino) == 7) ) then
+                        if (  (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 0))  ||
+                              (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 7)) ) then
                                 --putStrLn ("Jogada Impossível")
                                 realizaJogadas board 0 pecasJogador pecasComputador
 
@@ -122,7 +123,10 @@ realizaJogadas board turno pecasJogador pecasComputador  = do
                             realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 'P') (getInt linhaAtual) (getInt colunaAtual) 0 0 '1') 1 pecasJogador pecasComputador
 
                     else if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == 'c') then
-                        if ( ((getInt linhaDestino) == 7) || ((getInt colunaDestino) == 7) ) then
+                        if (  (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 0)) ||
+                              (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 7)) ||
+                              (((getInt linhaDestino) == 0) && ((getInt colunaDestino) == 7)) ||
+                              (((getInt linhaDestino) == 0) && ((getInt colunaDestino) == 0)) ) then
                                 --putStrLn ("Jogada Impossível")
                                 realizaJogadas board 0 pecasJogador pecasComputador
 
