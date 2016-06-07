@@ -74,17 +74,29 @@ getInt :: Char -> Int
 getInt x = digitToInt x
 
 ---------------Char -------------------
-charToString :: Char -> String
-charToString = (:[])
+charToInt :: Int -> Char
+charToInt x = intToDigit x
 
------fazer um encontra posicao das posicoes da lista, onde nao tive peça, remove a posicao
+--------mostra tabuleiro --------------
+
+mostraTabuleiro :: [[Char]] -> Int -> IO ()
+mostraTabuleiro board pos = do
+    if (pos <= 7) then do
+          print ( ([charToInt pos]) ++ " | " ++ (head board))
+          mostraTabuleiro (tail board) (pos + 1)
+
+     else
+          print("  |012345678")
 
  -------verificar posição ---------------------
 realizaJogadas :: [[Char]] -> Int -> Int-> Int-> [[Int]] -> IO ()
 realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
 
-    putStrLn "Tabuleiro"
-    print(board)
+    --putStrLn "Tabuleiro"
+    --print(board)
+    --putStrLn " -----------------------------------------------"
+
+    mostraTabuleiro board 0
 
     if (npecasComputador == 0) then do
         putStrLn("Parabén você venceu !")
@@ -149,7 +161,7 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                         realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp
 
                 else do  -- não é a proxima linha
-                    putStrLn (" --Jogada Impossível-- ")
+                    putStrLn (" -- Jogada Impossível : Não é uma casa alcançavel -- ")
                     realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp
                           --nao é uma jogada possivel
 
@@ -205,48 +217,102 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                 putStrLn (" -- Jogada Impossível : Não é uma peça válida -- ")
                 realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp --não é uma peça válida
 
-        else -- else turno computador
+        else do -- else turno computador
 
-            if ( (encontraPosicao board (head (head listaPecasComp)) (head (tail (head listaPecasComp))) ) == 'c')  then -- se existe uma peca na posicao atual
-
+            putStrLn " -- Turno computador  -- \n"
+            -- se existe uma peca na posicao atual
+            if ( (encontraPosicao board (head (head listaPecasComp)) (head (tail (head listaPecasComp))) ) == 'c')  then do
+                -- comer peca a direita
                 if( ((encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == 'p')  &&
-                    ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) + 2) ) == '1') ) then -- comer peca a direita
+                    ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) + 2) ) == '1') ) then do
 
                     realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 '1')
                         ((head (head listaPecasComp)) - 2 ) ((head (tail (head listaPecasComp))) + 2 ) 0 0 'c')
-                            0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) + 2)] : (tail listaPecasComp))
+                            0 (npecasJogador - 1) npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) + 2)] : (tail listaPecasComp))
 
-
+                -- comer peca a esquerda
                 else if( ((encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == 'p')  &&
-                    ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) - 2) ) == '1') ) then -- comer peca a esquerda
+                    ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) - 2) ) == '1') ) then do
 
                     realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 '1')
                         ((head (head listaPecasComp)) - 2 ) ((head (tail (head listaPecasComp))) - 2 ) 0 0 'c')
-                            0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) - 2)] : (tail listaPecasComp))
+                            0 (npecasJogador - 1) npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) - 2)] : (tail listaPecasComp))
 
-
-                else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == '1' ) then -- casa livre a direita
+                -- casa livre a direita
+                else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == '1' ) then
 
                     realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 'c')
                         (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
                             0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) + 1)] : (tail listaPecasComp))
 
-                else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == '1' ) then -- casa livre a esquerda
+                -- casa livre a esquerda
+                else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == '1' ) then
 
                     realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) 0 0 'c')
                         (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
                             0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (tail listaPecasComp))
 
-                --print(posicaoPecasComputador)
-                    --putStrLn "Nao e uma peca valida!"
+                --nenhuma jogada possível com a peça atual
                 else
-                    putStrLn "Nao e uma peca valida!"
+                    realizaJogadas board 1 npecasJogador npecasComputador  (reverse ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (reverse (tail listaPecasComp))))
+
+            -----------Dama Computador ---------------------
+
+            else if ( (encontraPosicao board (head (head listaPecasComp)) (head (tail (head listaPecasComp))) ) == 'C')  then do
+                -- comer peca a direita
+                if( ((encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == 'p')  &&
+                    ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) + 2) ) == '1') ) then do
+
+                    realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 '1')
+                        ((head (head listaPecasComp)) - 2 ) ((head (tail (head listaPecasComp))) + 2 ) 0 0 'C')
+                            0 (npecasJogador - 1) npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) + 2)] : (tail listaPecasComp))
+
+                -- comer peca a esquerda
+                else if( ((encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == 'p')  &&
+                    ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) - 2) ) == '1') ) then do
+
+                    realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 '1')
+                        ((head (head listaPecasComp)) - 2 ) ((head (tail (head listaPecasComp))) - 2 ) 0 0 'C')
+                            0 (npecasJogador - 1) npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) - 2)] : (tail listaPecasComp))
+
+                -- casa livre a direita
+                else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == '1' ) then
+
+                    realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 'C')
+                        (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
+                            0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) + 1)] : (tail listaPecasComp))
+
+                -- casa livre a direita para trás
+                else if( (encontraPosicao board ((head (head listaPecasComp)) + 1) ((head (tail (head listaPecasComp))) + 1) ) == '1' ) then
+
+                    realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) + 1) ((head (tail (head listaPecasComp))) + 1) 0 0 'C')
+                        (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
+                            0 npecasJogador npecasComputador ([((head (head listaPecasComp)) + 1),((head (tail (head listaPecasComp))) + 1)] : (tail listaPecasComp))
+
+
+                -- casa livre a esquerda
+                else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == '1' ) then
+
+                    realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) 0 0 'C')
+                        (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
+                            0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (tail listaPecasComp))
+
+                -- casa livre a esquerda para trás
+                else if( (encontraPosicao board ((head (head listaPecasComp)) + 1) ((head (tail (head listaPecasComp))) - 1) ) == '1' ) then
+
+                    realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) + 1) ((head (tail (head listaPecasComp))) - 1) 0 0 'C')
+                        (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
+                            0 npecasJogador npecasComputador ([((head (head listaPecasComp)) + 1),((head (tail (head listaPecasComp))) - 1)] : (tail listaPecasComp))
+
+
+                --nenhuma jogada possível com a peça atual
+                else
+                    realizaJogadas board 1 npecasJogador npecasComputador  (reverse ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (reverse (tail listaPecasComp))))
+
 
             else -- não é uma peça
-                    putStrLn "Nao e uma peca "
+                    realizaJogadas board 1 npecasJogador npecasComputador (tail listaPecasComp)
 
-
-             --return()
 
 -- ------- main ---------------------
 main = do
@@ -255,6 +321,9 @@ main = do
             putStrLn "Linha peça atual, Coluna peça atual, Linha casa de destino, Coluna casa de Destino"
             realizaJogadas tabuleiro 0 12 12 posicaoPecasComputador
 
+
+            --x <- randomRIO (0, 7 :: Int)
+            --y <- randomRIO (0, 7 :: Int)
 
             --print(posicaoPecasComputador)
             --print((head (head posicaoPecasComputador)) - 1)
@@ -266,6 +335,7 @@ main = do
 
             --print( [((head (head posicaoPecasComputador)) - 1),((head (tail (head posicaoPecasComputador))) + 1)])
             --print([((head (head posicaoPecasComputador)) - 1),((head (tail (head posicaoPecasComputador))) + 1)] : (tail posicaoPecasComputador) )
+            --print( reverse( [((head (head posicaoPecasComputador)) - 1),((head (tail (head posicaoPecasComputador))) + 1)] : (reverse (tail posicaoPecasComputador)) ))
             --print( tail (tail posicaoPecasComputador) )
             --print( tail (tail (tail posicaoPecasComputador) ))
             --print( tail (tail (tail (tail posicaoPecasComputador) )))
