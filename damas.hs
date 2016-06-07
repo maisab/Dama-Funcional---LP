@@ -13,9 +13,9 @@ tabuleiro          = [['p', '0', 'p', '0', 'p', '0', 'p', '0'],
                              ['c', '0', 'c', '0', 'c', '0', 'c', '0'],
                              ['0', 'c', '0', 'c', '0', 'c', '0', 'c']]
 
-posicaoPecasComputador = [[5,1],[5,3],[5,5],[5,7],
-                                        [6,0],[6,2],[6,4],[6,6],
-                                        [7,1],[7,3],[7,5],[7,7]]
+posicaoPecasComputador = [ [5,1],[5,3],[5,5],[5,7],
+                                                [6,0],[6,2],[6,4],[6,6],
+                                                [7,1],[7,3],[7,5],[7,7]]
 
 --pecas p sao do jogador
 --pecas c sao do computador
@@ -36,6 +36,14 @@ encontraColuna coluna pos linha = do -- percorre até achar a coluna certa na li
         then  head linha
     else
         encontraColuna coluna (pos + 1) (tail linha)
+
+----mostraTabuleiro-------------------
+--mostraTabuleiro :: [[Char]] -> Int -> IO ()
+--mostraTabuleiro board cont= do
+--    if(cont <= 7) then
+--        print (mostraTabuleiro (tail board) (cont + 1))
+--    else
+--        print ()
 
 ---------encontra peça computador -------------
 --encontraPecaComputador :: [[Char]] -> [Int] -> IO ()
@@ -69,38 +77,7 @@ getInt x = digitToInt x
 charToString :: Char -> String
 charToString = (:[])
 
------------------Concatena Posição -------------------
-setNum (x:xs) lin col linA colA novoValor1 novoValor2
-     | (lin == linA) = [(setColuna x col colA novoValor1 novoValor2)]++xs -- altera o valor na coluna e concatena a linha modificada com a tail
-     | (lin /= linA) = x:(setNum xs lin col (linA+1) colA novoValor1 novoValor2)--se nao é a linha verifica a próxma e sala a head
-
-setColuna (x1:xs1) col colA novoValor1 novoValor2
-     | (col == colA) = [novoValor1,novoValor2]++(tail xs1) -- concatena o novo valor com a cauda
-     | (col /= colA) = x1:(setColuna xs1 col (colA+1) novoValor1 novoValor2)-- salva a head e ve o proximo elemento da lista
-
 -----fazer um encontra posicao das posicoes da lista, onde nao tive peça, remove a posicao
-
------------------Remove Posição -------------------
-removePosicao (x:xs) lin col linA colA
-     | (lin == linA) = [(removeColuna x col colA)]++xs -- altera o valor na coluna e concatena a linha modificada com a tail
-     | (lin /= linA) = x:(removePosicao xs lin col (linA+1) colA)--se nao é a linha verifica a próxma e sala a head
-
-removeColuna (x1:xs1) col colA
-     | (col == colA) = (tail xs1) -- concatena o novo valor com a cauda
-     | (col /= colA) = x1:(removeColuna xs1 col (colA+1) )-- salva a head e ve o proximo elemento da lista
-
-
---concatenaPosicao :: [[Int]] -> Int -> Int -> [[Int]]
---concatenaPosicao (hd : ht) linhaDestino colunaDestino = do
---    ht ++ [(adicionaLinha ([colunaDestino]) linhaDestino)]
-
---adicionaLinha lista linhaDestino = do
---    linhaDestino : lista
-
--------------------Remove Posição -------------------
---removePosicao :: [[Int]] -> [[Int]]
---removePosicao lista = do
---    (tail lista)
 
  -------verificar posição ---------------------
 realizaJogadas :: [[Char]] -> Int -> Int-> Int-> [[Int]] -> IO ()
@@ -109,120 +86,153 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
     putStrLn "Tabuleiro"
     print(board)
 
-    linhaAtual <- getChar
-    colunaAtual <- getChar
-    linhaDestino <- getChar
-    colunaDestino <- getChar
+    if (npecasComputador == 0) then do
+        putStrLn("Parabén você venceu !")
+        return()
 
-    if (npecasComputador == 0) then
-        print("Parabén você venceu !")
-        --return()
-
-    else if (npecasJogador == 0) then
+    else if (npecasJogador == 0) then do
         putStrLn "Você perdeu :("
-        --return()
+        return()
 
-    else
-        if (turno == 0) then --se for a vez do jogador
-            if ( (encontraPosicao board (getInt linhaAtual) (getInt colunaAtual)) == 'p')  then -- se existe uma peca na posicao atual
+    else do
+        if (turno == 0) then do --se for a vez do jogador
+
+            putStrLn("Linha da peça atual : ")
+            linhaAtual <- getChar
+            getChar
+
+            putStrLn("Coluna da peça atual : ")
+            colunaAtual <- getChar
+            getChar
+
+            putStrLn("Linha da casa de destino : ")
+            linhaDestino <- getChar
+            getChar
+
+            putStrLn("Coluna da casa de destino : ")
+            colunaDestino <- getChar
+            getChar
+
+            if ( (encontraPosicao board (getInt linhaAtual) (getInt colunaAtual)) == 'p') then do-- se existe uma peca na posicao atual
+
                 if ( ((getInt linhaDestino) == ((getInt linhaAtual) + 1)) &&
                     ( ((getInt colunaDestino)  ==  ( (getInt colunaAtual) + 1)) || ( (getInt colunaDestino)  ==  (( getInt colunaAtual) - 1) ))  &&
-                    ( ((getInt linhaAtual) <= 7)  &&  (( (getInt colunaAtual) <= 7)  || ((getInt colunaAtual) >= 0)) ) ) then --se for uma casa possivel para direita
-                       --putStrLn "Nao e uma casa valida!"
+                    ( ((getInt linhaAtual) <= 7)  &&  (( (getInt colunaAtual) <= 7)  || ((getInt colunaAtual) >= 0)) ) ) then do
 
-                    if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == '1') then
-                        if ((getInt linhaDestino) == 7) then --vira dama
+                    if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == '1') then do
+                        if ((getInt linhaDestino) == 7) then do --vira dama
+                            putStrLn(" --Virou Dama!-- ")
                             realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 'P') (getInt linhaAtual) (getInt colunaAtual) 0 0 '1') 1 npecasJogador npecasComputador listaPecasComp
 
-                        else
+                        else do
                             realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 'p') (getInt linhaAtual) (getInt colunaAtual) 0 0 '1') 1 npecasJogador npecasComputador listaPecasComp
 
                     else if ( ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == 'c') &&      --se for peça do adversario e puder comer
                                 ( ((encontraPosicao board ((getInt linhaDestino) + 1) ((getInt colunaDestino) + 1)) == '1' ) ||
-                                ((encontraPosicao board ((getInt linhaDestino) + 1) ((getInt colunaDestino) - 1)) == '1') ) ) then
+                                ((encontraPosicao board ((getInt linhaDestino) + 1) ((getInt colunaDestino) - 1)) == '1') ) ) then do
 
                         if (  (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 0))  || -- inferior esquerdo
-                              (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 7)) ) then --inferior direito
-                                --putStrLn ("Jogada Impossível")
+                              (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 7)) ) then do --inferior direito
+
+                                putStrLn (" --Jogada Impossível-- ")
                                 realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp
 
-                        else --come a peca
-                                if( (getInt colunaDestino) == ( (getInt colunaAtual) + 1)) then --come para direita
-                                    realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) + 1) ( ( getInt colunaDestino) + 1) 0 0 'p') 1 npecasJogador (npecasComputador - 1) listaPecasComp
-                                else --come para esquerda
-                                    realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) + 1) ( (getInt colunaDestino) - 1) 0 0 'p') 1 npecasJogador (npecasComputador - 1) listaPecasComp
+                        else do --come a peca
+                            if( (getInt colunaDestino) == ( (getInt colunaAtual) + 1)) then do --come para direita
+                                realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) + 1) ( ( getInt colunaDestino) + 1) 0 0 'p') 1 npecasJogador (npecasComputador - 1) listaPecasComp
 
-                    else --posição inválida ou não é possivel comer
-                                realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp
+                            else do --come para esquerda
+                                realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) + 1) ( (getInt colunaDestino) - 1) 0 0 'p') 1 npecasJogador (npecasComputador - 1) listaPecasComp
 
-                -- não é a proxima linha
-                else
-                       putStrLn "Nao e uma casa valida!"
+                    else do--posição inválida ou não é possivel comer
+                        putStrLn (" --Jogada Impossível-- ")
+                        realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp
+
+                else do  -- não é a proxima linha
+                    putStrLn (" --Jogada Impossível-- ")
+                    realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp
                           --nao é uma jogada possivel
 
              ----------------------------------------Dama---------------------------
 
-            else if ( (encontraPosicao board (getInt linhaAtual) (getInt colunaAtual)) == 'P')  then  -- se existe uma peca na posicao atual
+            else if ( (encontraPosicao board (getInt linhaAtual) (getInt colunaAtual)) == 'P')  then do  -- se existe uma peca na posicao atual
+
                 if ( ((getInt linhaDestino) == ((getInt linhaAtual) + 1) || ((getInt linhaDestino) == ((getInt linhaAtual) - 1)) ) &&
                     ( ((getInt colunaDestino)  ==  ( (getInt colunaAtual) + 1)) || ( (getInt colunaDestino)  ==  ( ( getInt colunaAtual) - 1)) )  &&
-                    ( (((getInt linhaAtual) <= 7) || ((getInt linhaAtual) >= 0) )  &&  ( ((getInt colunaAtual) <= 7)  || ((getInt colunaAtual) >= 0)) )) then --se for uma casa possivel para direita
+                    ( (((getInt linhaAtual) <= 7) || ((getInt linhaAtual) >= 0) )  &&  ( ((getInt colunaAtual) <= 7)  || ((getInt colunaAtual) >= 0)) )) then do --se for uma casa possivel para direita
                        --putStrLn "Nao e uma casa valida!"
 
-                    if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == '1') then
+                    if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == '1') then do
                             realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 'P') (getInt linhaAtual) (getInt colunaAtual) 0 0 '1') 1 npecasJogador npecasComputador listaPecasComp
 
                     else if ( (encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == 'c' &&  --se for peça do adversario e puder comer
                                 ( ((encontraPosicao board ((getInt linhaDestino) + 1) ((getInt colunaDestino) + 1)) == '1' ) ||
                                 ((encontraPosicao board ((getInt linhaDestino) + 1) ((getInt colunaDestino) - 1)) == '1' ) ||
                                 ((encontraPosicao board ((getInt linhaDestino) - 1) ((getInt colunaDestino) + 1)) == '1' ) ||
-                                ((encontraPosicao board ((getInt linhaDestino) - 1) ((getInt colunaDestino) - 1)) == '1' ) ) ) then
+                                ((encontraPosicao board ((getInt linhaDestino) - 1) ((getInt colunaDestino) - 1)) == '1' ) ) ) then do
 
                         if (  (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 0)) || --inferior esquerdo
                               (((getInt linhaDestino) == 7) && ((getInt colunaDestino) == 7)) || --inferior direito
                               (((getInt linhaDestino) == 0) && ((getInt colunaDestino) == 7)) || --superior direito
-                              (((getInt linhaDestino) == 0) && ((getInt colunaDestino) == 0)) ) then --superior esquerdo
-                                --putStrLn ("Jogada Impossível")
+                              (((getInt linhaDestino) == 0) && ((getInt colunaDestino) == 0)) ) then do --superior esquerdo
+
+                                putStrLn ("Jogada Impossível")
                                 realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp
 
-                        else --come a peca
-                                if( (((getInt linhaDestino) == ( (getInt linhaAtual) + 1)) && ((getInt colunaDestino) == ( (getInt colunaAtual) + 1)) ) ) then --come para direita
+                        else do --come a peca
+                                if( (((getInt linhaDestino) == ( (getInt linhaAtual) + 1)) && ((getInt colunaDestino) == ( (getInt colunaAtual) + 1)) ) ) then do --come para direita
                                     realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) + 1) ( ( getInt colunaDestino) + 1) 0 0 'p') 1 npecasJogador (npecasComputador - 1) listaPecasComp
 
-                                else if ( ((getInt linhaDestino) == ( (getInt linhaAtual) + 1)) && ((getInt colunaDestino) == ( (getInt colunaAtual) - 1)) ) then -- come para esquerda
+                                else if ( ((getInt linhaDestino) == ( (getInt linhaAtual) + 1)) && ((getInt colunaDestino) == ( (getInt colunaAtual) - 1)) ) then do -- come para esquerda
                                     realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) + 1) ( (getInt colunaDestino) - 1) 0 0 'p') 1 npecasJogador (npecasComputador - 1) listaPecasComp
 
-                                else if ( ((getInt linhaDestino) == ( (getInt linhaAtual) - 1)) && ((getInt colunaDestino) == ( (getInt colunaAtual) + 1)) ) then -- come para trás e direita
+                                else if ( ((getInt linhaDestino) == ( (getInt linhaAtual) - 1)) && ((getInt colunaDestino) == ( (getInt colunaAtual) + 1)) ) then do -- come para trás e direita
                                     realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) - 1) ( (getInt colunaDestino) + 1) 0 0 'p') 1 npecasJogador (npecasComputador - 1) listaPecasComp
 
-                                else --come para trás e esquerda
+                                else do --come para trás e esquerda
                                     realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 '1') ( (getInt linhaDestino) - 1) ( (getInt colunaDestino) - 1) 0 0 'p') 1 npecasJogador (npecasComputador - 1) listaPecasComp
 
-                    else --posição inválida ou não é possivel comer
+                    else do --posição inválida ou não é possivel comer
+                                putStrLn (" --Jogada Impossível-- ")
                                 realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp
 
                 -- não é a proxima linha
-                else
-                       putStrLn "Nao e uma casa valida!"
-                          --nao é uma jogada possivel
+                else do
+                    putStrLn (" -- Jogada Impossível : Não é uma casa alcançavel -- ")
+                    realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp --nao é uma jogada possivel
 
-               ---------- Computador ------------------
+            else do -- else peça selecionada
+                putStrLn (" -- Jogada Impossível : Não é uma peça válida -- ")
+                realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp --não é uma peça válida
 
-
-               --------------------------------------------------
-
-            else -- else peça selecionada
-                putStrLn "Nao e uma peca valida!"
-
-        else -- else turno
+        else -- else turno computador
 
             if ( (encontraPosicao board (head (head listaPecasComp)) (head (tail (head listaPecasComp))) ) == 'c')  then -- se existe uma peca na posicao atual
 
-                if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == '1' ) then -- casa livre a direita
+                if( ((encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == 'p')  &&
+                    ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) + 2) ) == '1') ) then -- comer peca a direita
+
+                    realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 '1')
+                        ((head (head listaPecasComp)) - 2 ) ((head (tail (head listaPecasComp))) + 2 ) 0 0 'c')
+                            0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) + 2)] : (tail listaPecasComp))
+
+
+                else if( ((encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == 'p')  &&
+                    ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) - 2) ) == '1') ) then -- comer peca a esquerda
+
+                    realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 '1')
+                        ((head (head listaPecasComp)) - 2 ) ((head (tail (head listaPecasComp))) - 2 ) 0 0 'c')
+                            0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) - 2)] : (tail listaPecasComp))
+
+
+                else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == '1' ) then -- casa livre a direita
+
                     realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 'c')
                         (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
                             0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) + 1)] : (tail listaPecasComp))
 
                 else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == '1' ) then -- casa livre a esquerda
+
                     realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) 0 0 'c')
                         (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
                             0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (tail listaPecasComp))
@@ -231,6 +241,7 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                     --putStrLn "Nao e uma peca valida!"
                 else
                     putStrLn "Nao e uma peca valida!"
+
             else -- não é uma peça
                     putStrLn "Nao e uma peca "
 
@@ -240,8 +251,13 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
 -- ------- main ---------------------
 main = do
 
-            print(posicaoPecasComputador)
-            print((head (head posicaoPecasComputador)) - 1)
+            putStrLn "Digite as coordenadas na seguinte ordem e sem espaços e virgulas : "
+            putStrLn "Linha peça atual, Coluna peça atual, Linha casa de destino, Coluna casa de Destino"
+            realizaJogadas tabuleiro 0 12 12 posicaoPecasComputador
+
+
+            --print(posicaoPecasComputador)
+            --print((head (head posicaoPecasComputador)) - 1)
 
 
             --print( ((head (tail (head posicaoPecasComputador))) + 1) )((head (head posicaoPecasComputador)) - 1)
@@ -267,7 +283,5 @@ main = do
             --print(concatenaPosicao posicaoPecasComputador 3 1)
             --print(removePosicao posicaoPecasComputador)
 
-            --putStrLn "Digite as coordenadas na seguinte ordem e sem espaços e virgulas : "
-            --putStrLn "Linha peça atual, Coluna peça atual, Linha casa de destino, Coluna casa de Destino"
-            realizaJogadas tabuleiro 0 12 12 posicaoPecasComputador
+
 
