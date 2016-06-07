@@ -240,11 +240,13 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
 
                     --nenhuma jogada possível com a peça atual
                     else
+
                         realizaJogadas board 1 npecasJogador npecasComputador  (reverse ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (reverse (tail listaPecasComp))))
 
-                -----------Dama Computador ---------------------
+                --------------------------Dama Computador ---------------------------
 
                 else if ( (encontraPosicao board (head (head listaPecasComp)) (head (tail (head listaPecasComp))) ) == 'C')  then do
+
                     -- comer peca a direita
                     if( ((encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == 'p')  &&
                         ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) + 2) ) == '1') ) then do
@@ -253,6 +255,14 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                             ((head (head listaPecasComp)) - 2 ) ((head (tail (head listaPecasComp))) + 2 ) 0 0 'C')
                                 0 (npecasJogador - 1) npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) + 2)] : (tail listaPecasComp))
 
+                    -- comer peca a direita para trás
+                    else if( ((encontraPosicao board ((head (head listaPecasComp)) + 1) ((head (tail (head listaPecasComp))) + 1) ) == 'p')  &&
+                        ((encontraPosicao board ((head (head listaPecasComp)) + 2) ((head (tail (head listaPecasComp))) + 2) ) == '1') ) then do
+
+                        realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) + 1) ((head (tail (head listaPecasComp))) + 1) 0 0 '1')
+                            ((head (head listaPecasComp)) + 2 ) ((head (tail (head listaPecasComp))) + 2 ) 0 0 'C')
+                                0 (npecasJogador - 1) npecasComputador ([((head (head listaPecasComp)) + 2),((head (tail (head listaPecasComp))) + 2)] : (tail listaPecasComp))
+
                     -- comer peca a esquerda
                     else if( ((encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == 'p')  &&
                         ((encontraPosicao board ((head (head listaPecasComp)) - 2) ((head (tail (head listaPecasComp))) - 2) ) == '1') ) then do
@@ -260,6 +270,14 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                         realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 '1')
                             ((head (head listaPecasComp)) - 2 ) ((head (tail (head listaPecasComp))) - 2 ) 0 0 'C')
                                 0 (npecasJogador - 1) npecasComputador ([((head (head listaPecasComp)) - 2),((head (tail (head listaPecasComp))) - 2)] : (tail listaPecasComp))
+
+                    -- comer peca a esquerda para trás
+                    else if( ((encontraPosicao board ((head (head listaPecasComp)) + 1) ((head (tail (head listaPecasComp))) - 1) ) == 'p')  &&
+                        ((encontraPosicao board ((head (head listaPecasComp)) + 2) ((head (tail (head listaPecasComp))) - 2) ) == '1') ) then do
+
+                        realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 '1')
+                            ((head (head listaPecasComp)) + 2 ) ((head (tail (head listaPecasComp))) - 2 ) 0 0 'C')
+                                0 (npecasJogador - 1) npecasComputador ([((head (head listaPecasComp)) + 2),((head (tail (head listaPecasComp))) - 2)] : (tail listaPecasComp))
 
                     -- casa livre a direita
                     else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == '1' ) then
@@ -290,14 +308,15 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                             (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
                                 0 npecasJogador npecasComputador ([((head (head listaPecasComp)) + 1),((head (tail (head listaPecasComp))) - 1)] : (tail listaPecasComp))
 
-
                     --nenhuma jogada possível com a peça atual
-                    else
+                    else do
+                        putStrLn " entrou trocar cabeça da lista"
                         realizaJogadas board 1 npecasJogador npecasComputador  (reverse ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (reverse (tail listaPecasComp))))
 
 
-                else -- não é uma peça
-                        realizaJogadas board 1 npecasJogador npecasComputador (tail listaPecasComp)
+                else do -- não é uma peça
+                        putStrLn " entrou remover cabeça da lista"
+                        realizaJogadas board 1 npecasJogador npecasComputador (reverse ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (reverse (tail listaPecasComp))))
 
 
 -- ------- main ---------------------
