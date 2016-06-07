@@ -13,9 +13,7 @@ tabuleiro          = [['p', '0', 'p', '0', 'p', '0', 'p', '0'],
                              ['c', '0', 'c', '0', 'c', '0', 'c', '0'],
                              ['0', 'c', '0', 'c', '0', 'c', '0', 'c']]
 
-posicaoPecasComputador = [ [5,1],[5,3],[5,5],[5,7],
-                                                [6,0],[6,2],[6,4],[6,6],
-                                                [7,1],[7,3],[7,5],[7,7]]
+posicaoPecasComputador = [ [5,1], [6,0], [5,3], [6,2],[5,5],[5,7], [6,4],[6,6], [7,1],[7,3],[7,5],[7,7]]
 
 --pecas p sao do jogador
 --pecas c sao do computador
@@ -25,12 +23,14 @@ encontraPosicao :: [[Char]] -> Int -> Int -> Char
 encontraPosicao board linha coluna =
     encontraColuna coluna 0 (encontraLinha board linha 0)
 
+encontraLinha :: [[Char]] -> Int -> Int -> [Char]
 encontraLinha board linha pos  = do -- percorre as linhas até achar a linha certa
     if (linha == pos)
         then head board
     else
         encontraLinha (tail board) linha (pos + 1)
 
+encontraColuna :: Int -> Int -> [Char] -> Char
 encontraColuna coluna pos linha = do -- percorre até achar a coluna certa na linha
     if (coluna == pos)
         then  head linha
@@ -38,7 +38,7 @@ encontraColuna coluna pos linha = do -- percorre até achar a coluna certa na li
         encontraColuna coluna (pos + 1) (tail linha)
 
 -- -------troca posição-----------------------------------------------------------------------------
-
+trocaPosicao :: [[Char]] -> Int -> Int -> Int -> Int -> Char -> [[Char]]
 trocaPosicao (hd : ht) linha coluna contLinha contColuna char =
     if( linha == contLinha) then
         [(trocaColuna hd coluna contColuna char)] ++ ht --passa a lista da linha atual
@@ -87,7 +87,8 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
     else do
         if (turno == 0) then do --se for a vez do jogador
 
-            putStrLn("\n")
+            putStrLn " \n-- Seu turno  -- \n"
+
             putStrLn("Linha da peça atual : ")
             linhaAtual <- getChar
             getChar
@@ -149,7 +150,6 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                     else do  -- não é a proxima linha
                         putStrLn (" -- Jogada Impossível : Não é uma casa alcançavel -- ")
                         realizaJogadas board 0 npecasJogador npecasComputador listaPecasComp
-                              --nao é uma jogada possivel
 
                  ----------------------------------------Dama---------------------------
 
@@ -158,7 +158,6 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                     if ( ((getInt linhaDestino) == ((getInt linhaAtual) + 1) || ((getInt linhaDestino) == ((getInt linhaAtual) - 1)) ) &&
                         ( ((getInt colunaDestino)  ==  ( (getInt colunaAtual) + 1)) || ( (getInt colunaDestino)  ==  ( ( getInt colunaAtual) - 1)) )  &&
                         ( (((getInt linhaAtual) <= 7) || ((getInt linhaAtual) >= 0) )  &&  ( ((getInt colunaAtual) <= 7)  || ((getInt colunaAtual) >= 0)) )) then do --se for uma casa possivel para direita
-                           --putStrLn "Nao e uma casa valida!"
 
                         if ((encontraPosicao board (getInt linhaDestino) (getInt colunaDestino)) == '1') then do
                                 realizaJogadas ( trocaPosicao (trocaPosicao board (getInt linhaDestino) (getInt colunaDestino) 0 0 'P') (getInt linhaAtual) (getInt colunaAtual) 0 0 '1') 1 npecasJogador npecasComputador listaPecasComp
@@ -205,7 +204,8 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
 
             else do -- else turno computador
 
-                putStrLn " -- Turno computador  -- \n"
+                putStrLn " \n-- Turno computador  -- \n"
+
                 -- se existe uma peca na posicao atual
                 if ( (encontraPosicao board (head (head listaPecasComp)) (head (tail (head listaPecasComp))) ) == 'c')  then do
                     -- comer peca a direita
@@ -227,20 +227,37 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                     -- casa livre a direita
                     else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) ) == '1' ) then
 
-                        realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 'c')
-                            (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
-                                0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) + 1)] : (tail listaPecasComp))
+                        if (((head (head listaPecasComp)) - 1) == 7) then do --vira dama
+
+                            putStrLn(" --Virou Dama!-- ")
+
+                            realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 'C')
+                                (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
+                                    0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) + 1)] : (tail listaPecasComp))
+
+                        else do
+                            realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) + 1) 0 0 'c')
+                                (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
+                                    0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) + 1)] : (tail listaPecasComp))
 
                     -- casa livre a esquerda
                     else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == '1' ) then
 
-                        realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) 0 0 'c')
-                            (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
-                                0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (tail listaPecasComp))
+                        if (((head (head listaPecasComp)) - 1) == 7) then do --vira dama
+
+                            putStrLn(" --Virou Dama!-- ")
+                            realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) 0 0 'C')
+                                (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
+                                    0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (tail listaPecasComp))
+
+
+                        else  do
+                            realizaJogadas (trocaPosicao (trocaPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) 0 0 'c')
+                                (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
+                                    0 npecasJogador npecasComputador ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (tail listaPecasComp))
 
                     --nenhuma jogada possível com a peça atual
-                    else
-
+                    else do
                         realizaJogadas board 1 npecasJogador npecasComputador  (reverse ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (reverse (tail listaPecasComp))))
 
                 --------------------------Dama Computador ---------------------------
@@ -293,7 +310,6 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
                             (head (head listaPecasComp)) (head (tail (head listaPecasComp))) 0 0 '1')
                                 0 npecasJogador npecasComputador ([((head (head listaPecasComp)) + 1),((head (tail (head listaPecasComp))) + 1)] : (tail listaPecasComp))
 
-
                     -- casa livre a esquerda
                     else if( (encontraPosicao board ((head (head listaPecasComp)) - 1) ((head (tail (head listaPecasComp))) - 1) ) == '1' ) then
 
@@ -310,12 +326,10 @@ realizaJogadas board turno npecasJogador npecasComputador listaPecasComp = do
 
                     --nenhuma jogada possível com a peça atual
                     else do
-                        putStrLn " entrou trocar cabeça da lista"
                         realizaJogadas board 1 npecasJogador npecasComputador  (reverse ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (reverse (tail listaPecasComp))))
 
 
                 else do -- não é uma peça
-                        putStrLn " entrou remover cabeça da lista"
                         realizaJogadas board 1 npecasJogador npecasComputador (reverse ([((head (head listaPecasComp)) - 1),((head (tail (head listaPecasComp))) - 1)] : (reverse (tail listaPecasComp))))
 
 
@@ -326,15 +340,6 @@ main = do
             putStrLn "Linha peça atual, Coluna peça atual, Linha casa de destino, Coluna casa de Destino"
             realizaJogadas tabuleiro 0 12 12 posicaoPecasComputador
 
--- -----------------------deu certo
-
-            --print( [((head (head posicaoPecasComputador)) - 1),((head (tail (head posicaoPecasComputador))) + 1)])
-            --print([((head (head posicaoPecasComputador)) - 1),((head (tail (head posicaoPecasComputador))) + 1)] : (tail posicaoPecasComputador) )
-            --print( reverse( [((head (head posicaoPecasComputador)) - 1),((head (tail (head posicaoPecasComputador))) + 1)] : (reverse (tail posicaoPecasComputador)) ))
-            --print( tail (tail posicaoPecasComputador) )
-            --print( tail (tail (tail posicaoPecasComputador) ))
-            --print( tail (tail (tail (tail posicaoPecasComputador) )))
- ----------------------------------------------
 
 
 
